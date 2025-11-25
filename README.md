@@ -12,6 +12,7 @@ A high-fidelity recording platform inspired by [Riverside.fm](https://riverside.
 - [Project Structure](#-project-structure)
 - [Getting Started](#-getting-started)
 - [Environment Variables](#-environment-variables)
+- [Code Standards](#-code-standards)
 - [Known Issues & Bugs](#-known-issues--bugs)
 - [Architecture](#-architecture)
 - [Roadmap](#-roadmap)
@@ -129,9 +130,11 @@ streamside/
 
 ### Prerequisites
 
-- **Node.js** 18+
-- **pnpm** 9+ (`npm install -g pnpm`)
+- **Node.js** 18+ (check with `node -v`)
+- **pnpm** 9+ (required - `npm install -g pnpm`)
 - **Docker** & Docker Compose (for local services)
+
+> ⚠️ **Important**: This project uses **pnpm workspaces**. Do NOT use npm or yarn - it will break the monorepo structure.
 
 ### Option A: Using Supabase (Recommended for Quick Start)
 
@@ -144,25 +147,25 @@ streamside/
 
 2. **Set up Supabase:**
    - Create a project at [supabase.com](https://supabase.com)
-   - Get your connection strings from Project Settings > Database
+   - Go to Project Settings > Database > Connection string
+   - Copy both the **pooled** (port 6543) and **direct** (port 5432) connection strings
 
 3. **Configure environment:**
    ```bash
    cp .env.example .env
    ```
    
-   Edit `.env` and add your Supabase URLs:
+   Edit `.env` (in the **root directory only**):
    ```env
    # Pooler URL (port 6543) - for app queries
-   DATABASE_URL="postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true"
+   DATABASE_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true"
    
    # Direct URL (port 5432) - for migrations
-   DIRECT_URL="postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
+   DIRECT_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
    ```
 
-4. **Run migrations:**
+4. **Run database migrations:**
    ```bash
-   cd packages/database
    pnpm db:migrate
    ```
 
@@ -203,48 +206,126 @@ streamside/
 
 ## 🔐 Environment Variables
 
+> ⚠️ **Important**: Only create `.env` in the **root directory**. Do NOT create `.env` files in `apps/web/` or other subdirectories - the root `.env` is the single source of truth for all packages.
+
 Create a `.env` file in the root directory:
 
 ```env
 # ===========================================
 # Database (Supabase PostgreSQL)
 # ===========================================
-DATABASE_URL="postgresql://..."      # Pooler URL (port 6543)
-DIRECT_URL="postgresql://..."        # Direct URL (port 5432) for migrations
+DATABASE_URL="postgresql://..."      # Pooler URL (port 6543) - for app queries
+DIRECT_URL="postgresql://..."        # Direct URL (port 5432) - for migrations
 
 # ===========================================
 # Better Auth
 # ===========================================
-BETTER_AUTH_SECRET="generate-a-random-secret-here"
+BETTER_AUTH_SECRET="your-secret-key-change-this-in-production"
 BETTER_AUTH_URL="http://localhost:3000"
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
 
 # Google OAuth (Optional)
-GOOGLE_CLIENT_ID=""
-GOOGLE_CLIENT_SECRET=""
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
 
 # ===========================================
 # LiveKit (WebRTC)
 # ===========================================
 LIVEKIT_API_KEY="devkey"
 LIVEKIT_API_SECRET="secret"
-NEXT_PUBLIC_LIVEKIT_WS_URL="ws://localhost:7880"
+LIVEKIT_WS_URL="ws://localhost:7880"
 
 # ===========================================
 # MinIO (Object Storage)
 # ===========================================
 MINIO_ENDPOINT="localhost"
-MINIO_PORT="9000"
+MINIO_PORT=9000
 MINIO_ACCESS_KEY="minioadmin"
 MINIO_SECRET_KEY="minioadmin"
-MINIO_BUCKET="streamside-recordings"
-MINIO_USE_SSL="false"
+MINIO_BUCKET_NAME="recordings"
+MINIO_USE_SSL=false
 
 # ===========================================
 # Redis
 # ===========================================
 REDIS_URL="redis://localhost:6379"
+
+# ===========================================
+# App
+# ===========================================
+NODE_ENV="development"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+NEXT_PUBLIC_LIVEKIT_WS_URL="ws://localhost:7880"
 ```
+
+---
+
+## 📏 Code Standards
+
+### Package Manager
+
+> ⚠️ **Use pnpm ONLY** - This project uses pnpm workspaces. Do NOT use npm or yarn.
+
+```bash
+# ✅ Correct
+pnpm install
+pnpm add <package>
+pnpm dev
+
+# ❌ Wrong - will break workspace dependencies
+npm install
+yarn add <package>
+```
+
+### Project Conventions
+
+| Category | Convention |
+|----------|------------|
+| **Package Manager** | pnpm (enforced via `.npmrc`) |
+| **Node Version** | 18+ required |
+| **TypeScript** | Strict mode enabled |
+| **Styling** | Tailwind CSS v4 (CSS-based config, NOT `tailwind.config.js`) |
+| **Database** | Prisma 7 with `@prisma/adapter-pg` |
+| **Auth** | Better Auth (NOT NextAuth.js) |
+| **State** | Zustand for client state, React Query for server state |
+| **Imports** | Use workspace packages: `@streamside/database`, `@streamside/types`, `@streamside/ui` |
+
+### File Organization
+
+```
+apps/web/src/
+├── app/           # Next.js App Router pages & API routes
+├── lib/           # Utility functions and configurations
+├── services/      # Business logic services
+├── store/         # Zustand stores
+└── pages/         # Pages Router (Socket.io ONLY)
+
+packages/
+├── database/      # Prisma schema, migrations, client
+├── types/         # Shared TypeScript types
+└── ui/            # Shared React components
+```
+
+### Environment Variables
+
+- **Single source**: Root `.env` file only
+- **Client-side vars**: Must be prefixed with `NEXT_PUBLIC_`
+- **Never commit**: `.env` files with real credentials
+
+### Tailwind CSS v4
+
+This project uses Tailwind CSS v4 with the new CSS-based configuration:
+
+```css
+/* apps/web/src/app/globals.css */
+@import "tailwindcss";
+
+@theme {
+  --color-primary-500: #0ea5e9;
+  /* ... custom theme values */
+}
+```
+
+**Do NOT create `tailwind.config.js` or `tailwind.config.ts`** - all configuration is in `globals.css`.
 
 ---
 

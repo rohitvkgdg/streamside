@@ -26,7 +26,7 @@
 
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState, useRef } from 'react'
-import { useSession } from '@/lib/auth-client'
+import { useSession, type Session } from '@/lib/auth-client'
 import { useStudioStore } from '@/store/studio-store'
 import { Room, RoomEvent, Track } from 'livekit-client'
 import {
@@ -43,7 +43,10 @@ import { io, Socket } from 'socket.io-client'
 export default function StudioCall() {
     const params = useParams()
     const router = useRouter()
-    const { data: session, isPending } = useSession()
+    const { data: session, isPending } = useSession() as {
+        data: Session | null
+        isPending: boolean
+    }
     const studioId = params?.studioId as string | undefined
 
     const {
