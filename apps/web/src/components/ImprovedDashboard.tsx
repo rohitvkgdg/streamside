@@ -1,8 +1,5 @@
-'use client';
-
 import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Video, 
   Plus, 
@@ -16,7 +13,12 @@ import {
   Users,
   Folder
 } from 'lucide-react';
-import { ThemeToggle } from '../../components/ThemeToggle';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Input } from './ui/input';
+import { Badge } from './ui/badge';
+import { Avatar, AvatarFallback } from './ui/avatar';
+import { ThemeToggle } from './ThemeToggle';
 
 interface Studio {
   id: string;
@@ -27,7 +29,7 @@ interface Studio {
 }
 
 export default function ImprovedDashboard() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [inviteCode, setInviteCode] = useState('');
 
   const studios: Studio[] = [
@@ -55,16 +57,17 @@ export default function ImprovedDashboard() {
   ];
 
   const handleQuickStart = () => {
-    router.push('/studio/quick-' + Date.now());
+    navigate('/studio/quick-' + Date.now());
   };
 
   const handleJoinWithCode = () => {
     if (inviteCode.trim()) {
-      router.push(`/join/${inviteCode}`);
+      navigate(`/join/${inviteCode}`);
     }
   };
 
   const handleSchedule = () => {
+    // Schedule meeting logic
     alert('Schedule meeting feature coming soon!');
   };
 
@@ -74,7 +77,7 @@ export default function ImprovedDashboard() {
       <nav className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2">
               <div className="size-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
                 <Video className="size-5" />
               </div>
@@ -85,22 +88,22 @@ export default function ImprovedDashboard() {
               <ThemeToggle />
               
               <div className="relative group">
-                <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground size-9">
-                  <div className="size-8 rounded-full bg-muted flex items-center justify-center">
-                    <span className="text-sm">JD</span>
-                  </div>
-                </button>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <Avatar className="size-8">
+                    <AvatarFallback>JD</AvatarFallback>
+                  </Avatar>
+                </Button>
                 
                 {/* Dropdown */}
                 <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                   <div className="p-2">
-                    <Link href="/settings">
+                    <Link to="/settings">
                       <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent text-sm">
                         <User className="size-4" />
                         Profile
                       </button>
                     </Link>
-                    <Link href="/settings">
+                    <Link to="/settings">
                       <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent text-sm">
                         <Settings className="size-4" />
                         Settings
@@ -132,11 +135,11 @@ export default function ImprovedDashboard() {
         {/* Main Actions Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12 auto-rows-[180px]">
           {/* Start Instant Meeting - Large Primary Action */}
-          <div 
+          <Card 
             onClick={handleQuickStart}
-            className="md:col-span-2 md:row-span-2 group hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer bg-gradient-to-br from-primary/10 via-background to-background dark:from-primary/5 border-primary/30 rounded-xl border bg-card text-card-foreground shadow"
+            className="md:col-span-2 md:row-span-2 group hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer bg-gradient-to-br from-primary/10 via-background to-background dark:from-primary/5 border-primary/30"
           >
-            <div className="p-8 h-full flex flex-col justify-between">
+            <CardContent className="p-8 h-full flex flex-col justify-between">
               <div>
                 <div className="size-16 rounded-2xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
                   <Video className="size-8 text-primary" />
@@ -147,17 +150,17 @@ export default function ImprovedDashboard() {
                 </p>
               </div>
               <div className="mt-6">
-                <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-11 w-full group-hover:bg-primary/90">
+                <Button size="lg" className="w-full group-hover:bg-primary/90">
                   <Play className="size-5 mr-2" />
                   Start Now
-                </button>
+                </Button>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Join with Code */}
-          <div className="md:col-span-2 md:row-span-1 group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 bg-gradient-to-br from-blue-500/10 via-background to-background dark:from-blue-500/5 border-blue-500/20 rounded-xl border bg-card text-card-foreground shadow">
-            <div className="p-6 h-full flex flex-col justify-between">
+          <Card className="md:col-span-2 md:row-span-1 group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 bg-gradient-to-br from-blue-500/10 via-background to-background dark:from-blue-500/5 border-blue-500/20">
+            <CardContent className="p-6 h-full flex flex-col justify-between">
               <div className="flex items-start gap-4">
                 <div className="size-12 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                   <Link2 className="size-6 text-blue-600 dark:text-blue-400" />
@@ -165,28 +168,26 @@ export default function ImprovedDashboard() {
                 <div className="flex-1">
                   <h3 className="mb-3">Join with Code</h3>
                   <div className="flex gap-2">
-                    <input
+                    <Input
                       placeholder="Enter meeting code"
                       value={inviteCode}
                       onChange={(e) => setInviteCode(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleJoinWithCode()}
-                      className="flex-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex-1"
                     />
-                    <button onClick={handleJoinWithCode} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9">
-                      Join
-                    </button>
+                    <Button onClick={handleJoinWithCode}>Join</Button>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Schedule Meeting */}
-          <div 
+          <Card 
             onClick={handleSchedule}
-            className="md:col-span-1 md:row-span-1 group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer bg-gradient-to-br from-green-500/10 via-background to-background dark:from-green-500/5 border-green-500/20 rounded-xl border bg-card text-card-foreground shadow"
+            className="md:col-span-1 md:row-span-1 group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer bg-gradient-to-br from-green-500/10 via-background to-background dark:from-green-500/5 border-green-500/20"
           >
-            <div className="p-6 h-full flex flex-col justify-between">
+            <CardContent className="p-6 h-full flex flex-col justify-between">
               <div className="size-12 rounded-xl bg-green-500/10 dark:bg-green-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                 <Calendar className="size-6 text-green-600 dark:text-green-400" />
               </div>
@@ -196,15 +197,15 @@ export default function ImprovedDashboard() {
                   Plan ahead
                 </p>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* New Meeting Room */}
-          <div 
-            onClick={() => router.push('/studio/new')}
-            className="md:col-span-1 md:row-span-1 group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer bg-gradient-to-br from-purple-500/10 via-background to-background dark:from-purple-500/5 border-purple-500/20 rounded-xl border bg-card text-card-foreground shadow"
+          <Card 
+            onClick={() => navigate('/studio/new')}
+            className="md:col-span-1 md:row-span-1 group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer bg-gradient-to-br from-purple-500/10 via-background to-background dark:from-purple-500/5 border-purple-500/20"
           >
-            <div className="p-6 h-full flex flex-col justify-between">
+            <CardContent className="p-6 h-full flex flex-col justify-between">
               <div className="size-12 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                 <Plus className="size-6 text-purple-600 dark:text-purple-400" />
               </div>
@@ -214,14 +215,14 @@ export default function ImprovedDashboard() {
                   Create custom
                 </p>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="rounded-xl border bg-card text-card-foreground shadow">
-            <div className="p-6">
+          <Card>
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Active Rooms</p>
@@ -231,11 +232,11 @@ export default function ImprovedDashboard() {
                   <Video className="size-6 text-primary" />
                 </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="rounded-xl border bg-card text-card-foreground shadow">
-            <div className="p-6">
+          <Card>
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Total Participants</p>
@@ -247,11 +248,11 @@ export default function ImprovedDashboard() {
                   <Users className="size-6 text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="rounded-xl border bg-card text-card-foreground shadow">
-            <div className="p-6">
+          <Card>
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Meeting Rooms</p>
@@ -261,28 +262,28 @@ export default function ImprovedDashboard() {
                   <Folder className="size-6 text-green-600 dark:text-green-400" />
                 </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Recent Meeting Rooms */}
-        <div className="rounded-xl border bg-card text-card-foreground shadow">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl">Recent Meeting Rooms</h3>
-              <button onClick={() => router.push('/studio/new')} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-8">
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Recent Meeting Rooms</CardTitle>
+              <Button variant="outline" size="sm" onClick={() => navigate('/studio/new')}>
                 <Plus className="size-4 mr-2" />
                 New Room
-              </button>
+              </Button>
             </div>
-          </div>
-          <div className="p-6 pt-0">
+          </CardHeader>
+          <CardContent>
             <div className="space-y-3">
               {studios.map((studio) => (
                 <div
                   key={studio.id}
                   className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors group cursor-pointer"
-                  onClick={() => router.push(`/studio/${studio.id}`)}
+                  onClick={() => navigate(`/studio/${studio.id}`)}
                 >
                   <div className="flex items-center gap-4 flex-1">
                     <div className="size-12 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -292,10 +293,10 @@ export default function ImprovedDashboard() {
                       <div className="flex items-center gap-2">
                         <h4>{studio.name}</h4>
                         {studio.status === 'active' && (
-                          <span className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs bg-green-500/10 text-green-600 border-green-500/20">
+                          <Badge variant="secondary" className="bg-green-500/10 text-green-600 border-green-500/20">
                             <div className="size-2 rounded-full bg-green-500 mr-1 animate-pulse" />
                             Live
-                          </span>
+                          </Badge>
                         )}
                       </div>
                       <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
@@ -312,20 +313,17 @@ export default function ImprovedDashboard() {
                       </div>
                     </div>
                   </div>
-                  <button 
-                    className={`inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-9 ${
-                      studio.status === 'active' 
-                        ? 'bg-primary text-primary-foreground shadow hover:bg-primary/90' 
-                        : 'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground'
-                    } group-hover:bg-primary group-hover:text-primary-foreground`}
+                  <Button 
+                    variant={studio.status === 'active' ? 'default' : 'outline'}
+                    className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                   >
                     {studio.status === 'active' ? 'Join' : 'Enter Room'}
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );

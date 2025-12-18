@@ -1,8 +1,6 @@
-'use client';
-
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { Video, Monitor, Shield, Users, Zap, MessageSquare, ArrowRight, Globe, UserPlus, Feather } from 'lucide-react';
-import { ThemeToggle } from '../components/ThemeToggle';
+import { ThemeToggle } from './ThemeToggle';
 
 export default function ImprovedLandingPage() {
   return (
@@ -11,7 +9,7 @@ export default function ImprovedLandingPage() {
       <nav className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2">
               <div className="size-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
                 <Video className="size-5" />
               </div>
@@ -20,12 +18,12 @@ export default function ImprovedLandingPage() {
 
             <div className="flex items-center gap-4">
               <ThemeToggle />
-              <Link href="/auth/signin">
+              <Link to="/auth/signin">
                 <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-9">
                   Sign In
                 </button>
               </Link>
-              <Link href="/auth/signup">
+              <Link to="/auth/signup">
                 <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9">
                   Get Started Free
                 </button>
@@ -55,13 +53,13 @@ export default function ImprovedLandingPage() {
           </p>
           
           <div className="flex gap-4 justify-center flex-wrap">
-            <Link href="/auth/signup">
+            <Link to="/auth/signup">
               <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-8 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-12">
                 Start Meeting Now
                 <ArrowRight className="size-4 ml-2" />
               </button>
             </Link>
-            <Link href="/dashboard">
+            <Link to="/dashboard">
               <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-8 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-12">
                 View Demo
               </button>
@@ -235,7 +233,7 @@ export default function ImprovedLandingPage() {
             Join thousands of teams using Streamside for seamless video collaboration.
             No credit card required. Start your first meeting in 60 seconds.
           </p>
-          <Link href="/auth/signup">
+          <Link to="/auth/signup">
             <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-8 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-12">
               Get Started Free
               <ArrowRight className="size-4 ml-2" />
@@ -263,27 +261,27 @@ export default function ImprovedLandingPage() {
             <div>
               <h4 className="mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/" className="hover:text-foreground">Features</Link></li>
-                <li><Link href="/" className="hover:text-foreground">Pricing</Link></li>
-                <li><Link href="/" className="hover:text-foreground">Security</Link></li>
+                <li><Link to="/" className="hover:text-foreground">Features</Link></li>
+                <li><Link to="/" className="hover:text-foreground">Pricing</Link></li>
+                <li><Link to="/" className="hover:text-foreground">Security</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="mb-4">Company</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/" className="hover:text-foreground">About</Link></li>
-                <li><Link href="/" className="hover:text-foreground">Blog</Link></li>
-                <li><Link href="/" className="hover:text-foreground">Careers</Link></li>
+                <li><Link to="/" className="hover:text-foreground">About</Link></li>
+                <li><Link to="/" className="hover:text-foreground">Blog</Link></li>
+                <li><Link to="/" className="hover:text-foreground">Careers</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/" className="hover:text-foreground">Help Center</Link></li>
-                <li><Link href="/" className="hover:text-foreground">Contact</Link></li>
-                <li><Link href="/" className="hover:text-foreground">Status</Link></li>
+                <li><Link to="/" className="hover:text-foreground">Help Center</Link></li>
+                <li><Link to="/" className="hover:text-foreground">Contact</Link></li>
+                <li><Link to="/" className="hover:text-foreground">Status</Link></li>
               </ul>
             </div>
           </div>
