@@ -1,0 +1,44 @@
+version: '3.9'
+
+# =============================================================================
+# STREAMSIDE PRODUCTION DOCKER COMPOSE - FOR COOLIFY
+# =============================================================================
+# This file is optimized for deployment on Coolify/VPS alongside Vercel.
+# Vercel handles: Next.js app
+# Coolify handles: LiveKit (this compose file)
+#
+# BEFORE DEPLOYING:
+# 1. Set LIVEKIT_API_KEY and LIVEKIT_API_SECRET in Coolify environment
+# 2. Open firewall ports: 7880, 7881/tcp, 3478/udp, 50000-60000/udp
+# =============================================================================
+
+services:
+  livekit:
+    image: livekit/livekit-server:latest
+    container_name: livekit-server
+    restart: unless-stopped
+    network_mode: host  # CRITICAL: Maximum WebRTC performance, no NAT overhead
+    volumes:
+      - ./livekit.prod.yaml:/livekit.yaml:ro
+    command: --config /livekit.yaml --keys "${LIVEKIT_API_KEY}:${LIVEKIT_API_SECRET}"
+    environment:
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:7880/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+# =============================================================================
+# ENVIRONMENT VARIABLES REQUIRED (set in Coolify):
+# - LIVEKIT_API_KEY=APIStreamside
+# - LIVEKIT_API_SECRET=your-32-char-secret
+#
+# PORTS EXPOSED (via host network):
+# - 7880/tcp  - WebSocket signaling
+# - 7881/tcp  - ICE TCP fallback  
+# - 3478/udp  - TURN server
+# - 50000-60000/udp - RTC media
+# =============================================================================

@@ -1,28 +1,26 @@
-# LiveKit Production Configuration
+# LiveKit Production Configuration - High Performance
+# Deploy with: --config /etc/livekit.yaml --keys "$LIVEKIT_API_KEY:$LIVEKIT_API_SECRET"
 
 port: 7880
+bind_addresses:
+  - "0.0.0.0"
+
 rtc:
-  port_range_start: 7882
-  port_range_end: 7882
+  port_range_start: 50000
+  port_range_end: 60000
   use_external_ip: true
-  # For production, set your public IP or use TURN
-  # node_ip: "YOUR_PUBLIC_IP"
+  tcp_port: 7881
 
-redis:
-  address: redis:6379
+turn:
+  enabled: true
+  udp_port: 3478
 
-# Room settings
 room:
   auto_create: true
   empty_timeout: 300
   max_participants: 50
 
-# WebRTC settings  
-webrtc:
-  congestion_control:
-    enabled: true
-  
-# Logging
 logging:
   level: info
   json: true
+
