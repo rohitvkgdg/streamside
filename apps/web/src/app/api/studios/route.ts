@@ -59,25 +59,18 @@ export async function GET(req: NextRequest) {
  * POST /api/studios
  * Create a new studio
  * 
+ * Supports both authenticated users and guests
+ * 
  * Body:
  *  - name: string
  *  - description: string (optional)
+ *  - guestId: string (optional, for guest users)
+ *  - guestName: string (optional, for guest users)
  */
 export async function POST(req: NextRequest) {
     try {
-        const session = await auth.api.getSession({
-            headers: req.headers,
-        })
-
-        if (!session?.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            )
-        }
-
         const body = await req.json()
-        const { name, description } = body
+        const { name, description, guestId, guestName } = body
 
         if (!name) {
             return NextResponse.json(
@@ -86,11 +79,54 @@ export async function POST(req: NextRequest) {
             )
         }
 
+        // Check if this is a guest request
+        const isGuest = guestId && guestId.startsWith('guest-')
+
+        let hostId: string | null = null
+
+        if (!isGuest) {
+            // For non-guests, require authentication
+            const session = await auth.api.getSession({
+                headers: req.headers,
+            })
+
+            if (!session?.user) {
+                return NextResponse.json(
+                    { error: 'Unauthorized' },
+                    { status: 401 }
+                )
+            }
+            hostId = session.user.id
+        }
+
+        // For guests, we need to create a temporary user or handle differently
+        // Since hostId is required in the schema, we'll need to either:
+        // 1. Create a guest user record, or
+        // 2. Use a special "guest" user ID
+        // For now, let's skip DB storage for guest meetings and return a virtual studio
+
+        if (isGuest) {
+            // For guests, create a virtual studio (not stored in DB)
+            // Generate a random invite code for the guest
+            const virtualStudio = {
+                id: `guest-studio-${Math.random().toString(36).substring(2, 11)}`,
+                name,
+                description,
+                inviteCode: Math.random().toString(36).substring(2, 10).toUpperCase(),
+                isActive: true,
+                createdAt: new Date().toISOString(),
+                isGuest: true,
+                guestName: guestName || 'Guest',
+            }
+            return NextResponse.json({ studio: virtualStudio }, { status: 201 })
+        }
+
+        // For authenticated users, create a real studio in the database
         const studio = await prisma.studio.create({
             data: {
                 name,
                 description,
-                hostId: session.user.id,
+                hostId: hostId!,
             },
         })
 

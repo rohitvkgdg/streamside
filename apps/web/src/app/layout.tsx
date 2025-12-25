@@ -1,25 +1,25 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-import { Providers } from './providers'
-
-const inter = Inter({ subsets: ['latin'] })
+import type { Metadata } from 'next';
+import ClientProviders from '../components/ClientProviders';
+import '../styles/globals.css';
 
 export const metadata: Metadata = {
-    title: 'Streamside - High-Fidelity Recording Platform',
-    description: 'Record high-quality video and audio sessions with ease',
-}
+  title: 'Streamside - Video Calls Made Simple',
+  description:
+    'Connect instantly with HD video calls. No downloads, no hassle. Perfect for remote teams and quick sync-ups.',
+};
 
 export default function RootLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode
+  children: React.ReactNode;
 }) {
-    return (
-        <html lang="en">
-            <body className={inter.className}>
-                <Providers>{children}</Providers>
-            </body>
-        </html>
-    )
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <ClientProviders>
+          {children}
+        </ClientProviders>
+      </body>
+    </html>
+  );
 }

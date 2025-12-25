@@ -4,7 +4,8 @@ import path from 'node:path'
 import { defineConfig } from '@prisma/config'
 import dotenv from 'dotenv'
 
-// Load environment variables from root .env (single source of truth)
+// Load environment variables - try apps/web/.env first (where Supabase URL is), then root .env
+dotenv.config({ path: path.resolve(__dirname, '../../apps/web/.env') })
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 
 const databaseUrl = process.env.DATABASE_URL

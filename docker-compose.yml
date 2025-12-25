@@ -1,6 +1,26 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database for BetterAuth and application data
+  postgres:
+    image: postgres:16-alpine
+    container_name: streamside-postgres
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: streamside
+      POSTGRES_PASSWORD: streamside123
+      POSTGRES_DB: streamside
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U streamside -d streamside']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - streamside-network
+
   # Redis for Socket.io adapter and caching
   redis:
     image: redis:7-alpine
@@ -67,6 +87,7 @@ services:
       - streamside-network
 
 volumes:
+  postgres_data:
   redis_data:
 
 networks:
