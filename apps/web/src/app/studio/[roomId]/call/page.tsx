@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSession } from '@/lib/auth-client'
 import StudioCall, { Participant } from '@/components/StudioCall'
 import {
@@ -82,7 +82,7 @@ function LiveKitParticipantSync({
   )
 }
 
-export default function StudioCallPage() {
+function StudioCallPageContent() {
   const router = useRouter()
   const params = useParams()
   const searchParams = useSearchParams()
@@ -257,5 +257,13 @@ export default function StudioCallPage() {
         onLeave={handleLeaveStudio}
       />
     </LiveKitRoom>
+  )
+}
+
+export default function StudioCallPage() {
+  return (
+    <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center bg-background"><div className="w-5 h-5 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" /></div>}>
+      <StudioCallPageContent />
+    </Suspense>
   )
 }

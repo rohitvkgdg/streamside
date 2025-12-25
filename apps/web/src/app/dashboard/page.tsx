@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -28,7 +28,7 @@ interface Studio {
   lastActive: string;
 }
 
-export default function ImprovedDashboard() {
+function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session } = useSession();
@@ -258,7 +258,7 @@ export default function ImprovedDashboard() {
     <>
       {/* Guest Info Popup */}
       {showGuestPopup && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-100">
           <div className="bg-card rounded-lg p-6 w-96 shadow-xl relative">
             <button
               onClick={handleGuestCancel}
@@ -455,7 +455,7 @@ export default function ImprovedDashboard() {
               className="md:col-span-1 md:row-span-1 cursor-pointer rounded-xl border border-border bg-card text-card-foreground shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-200"
             >
               <div className="p-6 h-full flex flex-col justify-between">
-                <div className="size-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center mb-4">
+                <div className="size-12 rounded-xl bg-linear-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center mb-4">
                   <Plus className="size-6 text-primary" />
                 </div>
                 <div>
@@ -472,7 +472,7 @@ export default function ImprovedDashboard() {
               className="md:col-span-1 md:row-span-1 cursor-pointer rounded-xl border border-border bg-card text-card-foreground shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-200"
             >
               <div className="p-6 h-full flex flex-col justify-between">
-                <div className="size-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center mb-4">
+                <div className="size-12 rounded-xl bg-linear-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center mb-4">
                   <Calendar className="size-6 text-primary" />
                 </div>
                 <div>
@@ -487,7 +487,7 @@ export default function ImprovedDashboard() {
             <div className="md:col-span-2 md:row-span-1 rounded-xl border border-border bg-card text-card-foreground shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-200">
               <div className="p-6 h-full flex flex-col justify-between">
                 <div className="flex items-start gap-4">
-                  <div className="size-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center flex-shrink-0">
+                  <div className="size-12 rounded-xl bg-linear-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center shrink-0">
                     <Link2 className="size-6 text-primary" />
                   </div>
                   <div className="flex-1">
@@ -665,5 +665,13 @@ export default function ImprovedDashboard() {
         </main>
       </div>
     </>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><div className="animate-pulse h-96 w-full max-w-4xl bg-muted rounded-xl" /></div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }
