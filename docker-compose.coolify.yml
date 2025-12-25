@@ -1,15 +1,17 @@
 version: '3.9'
 
 # =============================================================================
-# STREAMSIDE PRODUCTION DOCKER COMPOSE - FOR COOLIFY
+# STREAMSIDE LIVEKIT - FOR COOLIFY
 # =============================================================================
-# This file is optimized for deployment on Coolify/VPS alongside Vercel.
-# Vercel handles: Next.js app
-# Coolify handles: LiveKit (this compose file)
+# Copy-paste this into Coolify Docker Compose service
+# No external files needed - everything is configured via command args
 #
-# BEFORE DEPLOYING:
-# 1. Set LIVEKIT_API_KEY and LIVEKIT_API_SECRET in Coolify environment
-# 2. Open firewall ports: 7880, 7881/tcp, 3478/udp, 50000-60000/udp
+# ENVIRONMENT VARIABLES TO SET IN COOLIFY:
+# - LIVEKIT_API_KEY     (e.g., APIStreamside)
+# - LIVEKIT_API_SECRET  (generate with: openssl rand -base64 32 | tr -d '/+=' | head -c 32)
+#
+# FIREWALL PORTS TO OPEN:
+# - 7880/tcp, 7881/tcp, 3478/udp, 50000-60000/udp
 # =============================================================================
 
 services:
@@ -17,13 +19,20 @@ services:
     image: livekit/livekit-server:latest
     container_name: livekit-server
     restart: unless-stopped
-    network_mode: host  # CRITICAL: Maximum WebRTC performance, no NAT overhead
-    volumes:
-      - ./livekit.prod.yaml:/livekit.yaml:ro
-    command: --config /livekit.yaml --keys "${LIVEKIT_API_KEY}:${LIVEKIT_API_SECRET}"
-    environment:
-      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
-      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}
+    network_mode: host
+    command: >
+      --bind 0.0.0.0
+      --port 7880
+      --rtc.port-range-start 50000
+      --rtc.port-range-end 60000
+      --rtc.tcp-port 7881
+      --rtc.use-external-ip
+      --turn.enabled
+      --turn.udp-port 3478
+      --room.auto-create
+      --room.empty-timeout 300s
+      --room.max-participants 50
+      --keys "${LIVEKIT_API_KEY}:${LIVEKIT_API_SECRET}"
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:7880/"]
       interval: 30s
@@ -31,14 +40,3 @@ services:
       retries: 3
       start_period: 10s
 
-# =============================================================================
-# ENVIRONMENT VARIABLES REQUIRED (set in Coolify):
-# - LIVEKIT_API_KEY=APIStreamside
-# - LIVEKIT_API_SECRET=your-32-char-secret
-#
-# PORTS EXPOSED (via host network):
-# - 7880/tcp  - WebSocket signaling
-# - 7881/tcp  - ICE TCP fallback  
-# - 3478/udp  - TURN server
-# - 50000-60000/udp - RTC media
-# =============================================================================
