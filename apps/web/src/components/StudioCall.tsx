@@ -605,32 +605,53 @@ export default function StudioCall({
   };
 
   return (
-    <div className="h-screen bg-neutral-100 dark:bg-neutral-900 flex flex-col">
-      {/* Header */}
-      <header className="bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 px-4 py-3">
+    <div className="h-screen w-screen bg-black relative overflow-hidden">
+      {/* Fullscreen Header - Translucent, auto-hide */}
+      <header
+        className={`absolute top-0 left-0 right-0 z-40 bg-black/60 backdrop-blur-md border-b border-white/10 px-4 py-2 transition-all duration-300 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
+          }`}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div>
-              <h2 className="text-sm font-semibold">{studioName}</h2>
-              <p className="text-xs text-muted-foreground">Studio Session</p>
+              <h2 className="text-sm font-semibold text-white">{studioName}</h2>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-white/60">Studio Session</p>
+                {/* Bitrate Indicator */}
+                <span className="text-xs px-1.5 py-0.5 bg-white/10 rounded text-white/80">
+                  {videoBitrate === 'low' ? '1.5 Mbps' : videoBitrate === 'medium' ? '3 Mbps' : videoBitrate === 'high' ? '4.5 Mbps' : '6 Mbps'}
+                </span>
+              </div>
             </div>
 
             {isRecording && (
-              <div className="ml-2 flex items-center gap-1.5">
-                <div className="size-2 rounded-full bg-destructive animate-pulse" />
+              <div className="ml-2 flex items-center gap-1.5 px-2 py-1 bg-red-500/20 rounded">
+                <div className="size-2 rounded-full bg-red-500 animate-pulse" />
+                <span className="text-xs text-red-400 font-medium">REC</span>
               </div>
             )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* Fullscreen Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/10"
+              onClick={toggleFullscreen}
+            >
+              <Maximize2 className="size-4" />
+            </Button>
+
             {/* Theme Toggle */}
             <ThemeToggle />
 
             {/* Invite Button */}
             {inviteCode && (
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
+                className="text-white hover:bg-white/10"
                 onClick={() => setShowInviteModal(true)}
               >
                 <UserPlus className="size-4 mr-2" />
@@ -639,17 +660,18 @@ export default function StudioCall({
             )}
 
             <Button
-              variant={showParticipants ? 'default' : 'outline'}
+              variant={showParticipants ? 'secondary' : 'ghost'}
               size="sm"
+              className="text-white hover:bg-white/10"
               onClick={() => setShowParticipants(!showParticipants)}
             >
               <Users className="size-4 mr-2" />
-              {participants.length + 1} {/* +1 for you (local) */}
+              {participants.length + 1}
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
+                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                   <MoreVertical className="size-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -685,8 +707,8 @@ export default function StudioCall({
         </div>
       </header>
 
-      {/* Main Content - Google Meet style layout with PiP support */}
-      <main className="flex-1 relative overflow-hidden bg-neutral-100 dark:bg-neutral-900">
+      {/* Main Content - Fullscreen video layout */}
+      <main className="absolute inset-0 overflow-hidden bg-black">
         {(() => {
           // Check if anyone is screen sharing
           const remoteScreenSharer = allParticipants.find(p => !p.isLocal && p.getTrackPublication(Track.Source.ScreenShare)?.track);
@@ -700,9 +722,9 @@ export default function StudioCall({
               : remoteScreenSharer?.getTrackPublication(Track.Source.ScreenShare);
 
             return (
-              <div className="h-full flex flex-col p-4">
-                {/* Main Screen Share View */}
-                <div className="flex-1 relative bg-neutral-800 dark:bg-neutral-950 rounded-xl overflow-hidden shadow-xl">
+              <div className="h-full w-full relative">
+                {/* Main Screen Share View - Full viewport */}
+                <div className="absolute inset-0 bg-black">
                   {screenTrack?.track && screenShareParticipant && (
                     <VideoTrack
                       trackRef={{
