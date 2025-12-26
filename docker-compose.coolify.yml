@@ -1,13 +1,13 @@
 version: '3.9'
 
 # =============================================================================
-# STREAMSIDE LIVEKIT - FOR COOLIFY
+# STREAMSIDE LIVEKIT - PRODUCTION (FOR COOLIFY)
 # =============================================================================
-# SETUP:
-# 1. SSH to server: mkdir -p /opt/livekit
-# 2. Create /opt/livekit/config.yaml with content below
-# 3. Open ports: 7880,7881/tcp and 3478,50000-60000/udp
-# 4. Deploy this compose in Coolify
+#
+# SETUP IN COOLIFY:
+# 1. Add this as Docker Compose service
+# 2. Set environment variables (see below)
+# 3. Open firewall: 7880,7881/tcp and 3478,50000-60000/udp
 # =============================================================================
 
 services:
@@ -16,12 +16,16 @@ services:
     container_name: livekit-server
     restart: unless-stopped
     network_mode: host
-    volumes:
-      - /opt/livekit/config.yaml:/config.yaml:ro
-    command: ["--config", "/config.yaml"]
+    environment:
+      # LIVEKIT_CONFIG contains the entire config as YAML
+      # Set this in Coolify environment variables (see below for value)
+      LIVEKIT_CONFIG: ${LIVEKIT_CONFIG}
 
 # =============================================================================
-# /opt/livekit/config.yaml content (create on server):
+# COOLIFY ENVIRONMENT VARIABLE:
+# 
+# Name: LIVEKIT_CONFIG
+# Value (copy exactly, replace YOUR_API_SECRET):
 # -----------------------------------------------------------------------------
 # port: 7880
 # bind_addresses:
@@ -35,11 +39,17 @@ services:
 #   enabled: true
 #   udp_port: 3478
 # keys:
-#   APIStreamside: YOUR_SECRET_HERE
+#   APIStreamside: YOUR_API_SECRET
 # room:
 #   auto_create: true
 #   empty_timeout: 300
 #   max_participants: 50
 # logging:
 #   level: info
+# =============================================================================
+# 
+# VERCEL ENVIRONMENT VARIABLES:
+# - LIVEKIT_API_KEY=APIStreamside
+# - LIVEKIT_API_SECRET=YOUR_API_SECRET (same as above)
+# - NEXT_PUBLIC_LIVEKIT_WS_URL=wss://YOUR_SERVER_IP:7880
 # =============================================================================
