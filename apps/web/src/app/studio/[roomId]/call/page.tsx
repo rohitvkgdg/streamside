@@ -147,10 +147,13 @@ function StudioCallPageContent() {
     }
   }, [isPending, session, guestInfo, router])
 
-  // Fetch LiveKit token with retry logic
+  // Fetch LiveKit token with retry logic - only once
+  const hasFetchedToken = useRef(false)
   useEffect(() => {
     if (!studioId) return
     if (!session && !guestInfo) return
+    // Don't re-fetch if we already have a token
+    if (hasFetchedToken.current && token) return
 
     let retryCount = 0
     const maxRetries = 3
@@ -175,6 +178,7 @@ function StudioCallPageContent() {
         if (!res.ok) throw new Error(data.error || 'Failed to get access token')
         setToken(data.token)
         setWsUrl(data.wsUrl)
+        hasFetchedToken.current = true
       } catch (err) {
         console.error(`Token fetch attempt ${retryCount + 1} failed:`, err)
 
@@ -193,7 +197,7 @@ function StudioCallPageContent() {
     }
 
     fetchTokenWithRetry()
-  }, [studioId, session, guestInfo])
+  }, [studioId, session, guestInfo, token])
 
   const handleLeaveStudio = useCallback(() => {
     if (guestInfo) {
