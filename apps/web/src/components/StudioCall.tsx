@@ -798,7 +798,7 @@ export default function StudioCall({
                       className="absolute inset-0 w-full h-full object-contain bg-black"
                     />
                   )}
-                  <div className="absolute top-4 left-4 px-3 py-1 bg-black/60 rounded-lg">
+                  <div className="absolute top-16 left-4 px-3 py-1 bg-black/60 rounded-lg">
                     <p className="text-white text-sm font-medium">
                       {isScreenSharing ? 'You are sharing your screen' : `${remoteScreenSharer?.name || remoteScreenSharer?.identity} is sharing`}
                     </p>
@@ -849,45 +849,51 @@ export default function StudioCall({
           }
 
           // Normal Grid Layout: No screen share active
-          return (
-            <div className="h-full flex items-center justify-center p-4 md:p-8">
-              <div className={`w-full max-w-6xl ${allParticipants.filter(p => !p.isLocal).length === 0 ? 'max-w-4xl' : ''}`}>
-                <div className={`grid gap-3 ${allParticipants.filter(p => !p.isLocal).length === 0
-                  ? 'grid-cols-1'
-                  : allParticipants.filter(p => !p.isLocal).length === 1
-                    ? 'grid-cols-1 md:grid-cols-2'
-                    : allParticipants.filter(p => !p.isLocal).length <= 3
-                      ? 'grid-cols-2'
-                      : 'grid-cols-2 md:grid-cols-3'
-                  }`}>
-                  {/* Your camera */}
-                  <div className="relative bg-neutral-800 dark:bg-neutral-950 rounded-xl overflow-hidden shadow-xl" style={{ aspectRatio: '16/9' }}>
-                    {videoEnabled && localVideoTrack?.track ? (
-                      <VideoTrack
-                        trackRef={{ participant: localParticipant!, publication: localVideoTrack, source: Track.Source.Camera }}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        style={mirrorVideo ? { transform: 'scaleX(-1)' } : {}}
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-neutral-700 dark:bg-neutral-800">
-                        <Avatar className="size-24 md:size-32">
-                          <AvatarFallback className="text-3xl md:text-4xl bg-neutral-600 text-white">You</AvatarFallback>
-                        </Avatar>
-                      </div>
-                    )}
+          const remoteParticipants = allParticipants.filter(p => !p.isLocal);
+          const participantsPerPage = 8; // 8 remote + 1 local = 9 max per page
+          const totalPages = Math.max(1, Math.ceil(remoteParticipants.length / participantsPerPage));
+          const safeCurrentPage = Math.min(currentPage, totalPages - 1);
+          const startIdx = safeCurrentPage * participantsPerPage;
+          const paginatedRemote = remoteParticipants.slice(startIdx, startIdx + participantsPerPage);
 
-                    <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 bg-linear-to-t from-black/70 to-transparent">
-                      <div className="flex items-center gap-2">
-                        <p className="text-white text-sm md:text-base font-medium">You</p>
-                        <Badge variant="secondary" className="text-xs bg-white/20 text-white border-0">Local</Badge>
+          return (
+            <div className="h-full flex flex-col pt-14 pb-24">
+              <div className="flex-1 flex items-center justify-center p-4 md:p-6">
+                <div className={`w-full max-w-6xl ${paginatedRemote.length === 0 ? 'max-w-4xl' : ''}`}>
+                  <div className={`grid gap-3 ${paginatedRemote.length === 0
+                    ? 'grid-cols-1'
+                    : paginatedRemote.length === 1
+                      ? 'grid-cols-1 md:grid-cols-2'
+                      : paginatedRemote.length <= 3
+                        ? 'grid-cols-2'
+                        : 'grid-cols-2 md:grid-cols-3'
+                    }`}>
+                    {/* Your camera */}
+                    <div className="relative bg-neutral-800 dark:bg-neutral-950 rounded-xl overflow-hidden shadow-xl" style={{ aspectRatio: '16/9' }}>
+                      {videoEnabled && localVideoTrack?.track ? (
+                        <VideoTrack
+                          trackRef={{ participant: localParticipant!, publication: localVideoTrack, source: Track.Source.Camera }}
+                          className="absolute inset-0 w-full h-full object-cover"
+                          style={mirrorVideo ? { transform: 'scaleX(-1)' } : {}}
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center bg-neutral-700 dark:bg-neutral-800">
+                          <Avatar className="size-24 md:size-32">
+                            <AvatarFallback className="text-3xl md:text-4xl bg-neutral-600 text-white">You</AvatarFallback>
+                          </Avatar>
+                        </div>
+                      )}
+
+                      <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 bg-linear-to-t from-black/70 to-transparent">
+                        <div className="flex items-center gap-2">
+                          <p className="text-white text-sm md:text-base font-medium">You</p>
+                          <Badge variant="secondary" className="text-xs bg-white/20 text-white border-0">Local</Badge>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Remote participants */}
-                  {allParticipants
-                    .filter(p => !p.isLocal)
-                    .map((participant) => {
+                    {/* Remote participants (paginated) */}
+                    {paginatedRemote.map((participant) => {
                       const videoTrack = participant.getTrackPublication(Track.Source.Camera);
 
                       return (
@@ -919,8 +925,36 @@ export default function StudioCall({
                         </div>
                       );
                     })}
+                  </div>
                 </div>
               </div>
+
+              {/* Pagination controls */}
+              {totalPages > 1 && (
+                <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/70 backdrop-blur-xl rounded-full px-3 py-1.5 border border-white/10 z-30">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 rounded-full text-white hover:bg-white/10 disabled:opacity-30"
+                    onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                    disabled={safeCurrentPage === 0}
+                  >
+                    <IconChevronLeft className="size-4" />
+                  </Button>
+                  <span className="text-white text-sm px-2">
+                    {safeCurrentPage + 1} / {totalPages}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 rounded-full text-white hover:bg-white/10 disabled:opacity-30"
+                    onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
+                    disabled={safeCurrentPage === totalPages - 1}
+                  >
+                    <IconChevronRight className="size-4" />
+                  </Button>
+                </div>
+              )}
             </div>
           );
         })()}
