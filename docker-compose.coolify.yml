@@ -26,7 +26,7 @@ services:
           - "0.0.0.0"
         rtc:
           port_range_start: 50000
-          port_range_end: 50020
+          port_range_end: 50100
           use_external_ip: true
           tcp_port: 7881
         turn:
@@ -37,14 +37,14 @@ services:
         room:
           auto_create: true
           empty_timeout: 300
-          max_participants: 20
+          max_participants: 80
         logging:
           level: info
     deploy:
       resources:
         limits:
-          cpus: '2'
-          memory: 1G
+          cpus: '8'
+          memory: 16G
         reservations:
-          cpus: '0.5'
-          memory: 256M
+          cpus: '4'
+          memory: 8G
