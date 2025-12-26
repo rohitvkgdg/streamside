@@ -180,10 +180,16 @@ export default function StudioCall({
   useEffect(() => {
     if (!studioId) return;
 
+    // Don't reinitialize if socket already exists and connected
+    if (socketRef.current?.connected) return;
+
     // Initialize socket connection
     const socket = io({
       path: '/api/socket/io',
       transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
     });
 
     socket.on('connect', () => {
@@ -600,6 +606,10 @@ export default function StudioCall({
         'Recording is in progress. Are you sure you want to leave?'
       );
       if (!confirmed) return;
+    }
+    // Exit fullscreen before leaving
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(console.error);
     }
     onLeave();
   };
