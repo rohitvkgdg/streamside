@@ -23,6 +23,7 @@ import {
   Link2,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Maximize2,
   Move,
 } from 'lucide-react';
@@ -91,6 +92,12 @@ export default function StudioCall({
   const [pipPosition, setPipPosition] = useState({ x: 20, y: 20 });
   const [isDraggingPip, setIsDraggingPip] = useState(false);
   const [bitrateApplied, setBitrateApplied] = useState(false);
+
+  // Device selection state
+  const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
+  const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedAudioDevice, setSelectedAudioDevice] = useState<string>('');
+  const [selectedVideoDevice, setSelectedVideoDevice] = useState<string>('');
 
   // Socket connection
   const socketRef = useRef<Socket | null>(null);
@@ -175,6 +182,55 @@ export default function StudioCall({
       room.off(RoomEvent.ConnectionQualityChanged, handleConnectionQualityChange);
     };
   }, [room, localParticipant]);
+
+  // Enumerate audio/video devices
+  useEffect(() => {
+    async function enumerateDevices() {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const audioInputs = devices.filter(d => d.kind === 'audioinput');
+        const videoInputs = devices.filter(d => d.kind === 'videoinput');
+        setAudioDevices(audioInputs);
+        setVideoDevices(videoInputs);
+        // Set default selections if not already set
+        if (!selectedAudioDevice && audioInputs.length > 0) {
+          setSelectedAudioDevice(audioInputs[0].deviceId);
+        }
+        if (!selectedVideoDevice && videoInputs.length > 0) {
+          setSelectedVideoDevice(videoInputs[0].deviceId);
+        }
+      } catch (err) {
+        console.error('Failed to enumerate devices:', err);
+      }
+    }
+    enumerateDevices();
+    // Re-enumerate when devices change
+    navigator.mediaDevices.addEventListener('devicechange', enumerateDevices);
+    return () => {
+      navigator.mediaDevices.removeEventListener('devicechange', enumerateDevices);
+    };
+  }, [selectedAudioDevice, selectedVideoDevice]);
+
+  // Switch audio/video device handlers
+  const handleSwitchAudioDevice = useCallback(async (deviceId: string) => {
+    if (!room) return;
+    try {
+      await room.switchActiveDevice('audioinput', deviceId);
+      setSelectedAudioDevice(deviceId);
+    } catch (err) {
+      console.error('Failed to switch audio device:', err);
+    }
+  }, [room]);
+
+  const handleSwitchVideoDevice = useCallback(async (deviceId: string) => {
+    if (!room) return;
+    try {
+      await room.switchActiveDevice('videoinput', deviceId);
+      setSelectedVideoDevice(deviceId);
+    } catch (err) {
+      console.error('Failed to switch video device:', err);
+    }
+  }, [room]);
 
   // Socket.io connection for real-time chat
   useEffect(() => {
@@ -1205,23 +1261,75 @@ export default function StudioCall({
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant={audioEnabled ? 'ghost' : 'destructive'}
-              size="icon"
-              className={`size-12 rounded-full ${audioEnabled ? 'text-white hover:bg-white/10' : ''}`}
-              onClick={handleToggleAudio}
-            >
-              {audioEnabled ? <Mic className="size-5" /> : <MicOff className="size-5" />}
-            </Button>
+            {/* Audio with device selector */}
+            <DropdownMenu>
+              <div className="flex">
+                <Button
+                  variant={audioEnabled ? 'ghost' : 'destructive'}
+                  size="icon"
+                  className={`size-12 rounded-l-full rounded-r-none ${audioEnabled ? 'text-white hover:bg-white/10' : ''}`}
+                  onClick={handleToggleAudio}
+                >
+                  {audioEnabled ? <Mic className="size-5" /> : <MicOff className="size-5" />}
+                </Button>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant={audioEnabled ? 'ghost' : 'destructive'}
+                    size="icon"
+                    className={`size-12 rounded-r-full rounded-l-none border-l border-white/20 px-1 ${audioEnabled ? 'text-white hover:bg-white/10' : ''}`}
+                  >
+                    <ChevronDown className="size-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+              </div>
+              <DropdownMenuContent align="center" className="max-w-[250px]">
+                <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">Microphone</div>
+                {audioDevices.map(device => (
+                  <DropdownMenuItem
+                    key={device.deviceId}
+                    onClick={() => handleSwitchAudioDevice(device.deviceId)}
+                    className={selectedAudioDevice === device.deviceId ? 'bg-accent' : ''}
+                  >
+                    <span className="truncate">{device.label || `Microphone ${device.deviceId.slice(0, 5)}`}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-            <Button
-              variant={videoEnabled ? 'ghost' : 'destructive'}
-              size="icon"
-              className={`size-12 rounded-full ${videoEnabled ? 'text-white hover:bg-white/10' : ''}`}
-              onClick={handleToggleVideo}
-            >
-              {videoEnabled ? <Video className="size-5" /> : <VideoOff className="size-5" />}
-            </Button>
+            {/* Video with device selector */}
+            <DropdownMenu>
+              <div className="flex">
+                <Button
+                  variant={videoEnabled ? 'ghost' : 'destructive'}
+                  size="icon"
+                  className={`size-12 rounded-l-full rounded-r-none ${videoEnabled ? 'text-white hover:bg-white/10' : ''}`}
+                  onClick={handleToggleVideo}
+                >
+                  {videoEnabled ? <Video className="size-5" /> : <VideoOff className="size-5" />}
+                </Button>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant={videoEnabled ? 'ghost' : 'destructive'}
+                    size="icon"
+                    className={`size-12 rounded-r-full rounded-l-none border-l border-white/20 px-1 ${videoEnabled ? 'text-white hover:bg-white/10' : ''}`}
+                  >
+                    <ChevronDown className="size-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+              </div>
+              <DropdownMenuContent align="center" className="max-w-[250px]">
+                <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">Camera</div>
+                {videoDevices.map(device => (
+                  <DropdownMenuItem
+                    key={device.deviceId}
+                    onClick={() => handleSwitchVideoDevice(device.deviceId)}
+                    className={selectedVideoDevice === device.deviceId ? 'bg-accent' : ''}
+                  >
+                    <span className="truncate">{device.label || `Camera ${device.deviceId.slice(0, 5)}`}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <Button
               variant={isScreenSharing ? 'secondary' : 'ghost'}
