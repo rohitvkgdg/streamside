@@ -3,30 +3,30 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 import {
-  Video,
-  AlertTriangle,
-  Mic,
-  MicOff,
-  VideoOff,
-  Monitor,
-  Settings,
-  Phone,
-  Radio,
-  Users,
-  MessageSquare,
-  MoreVertical,
-  X,
-  Send,
-  UserPlus,
-  Copy,
-  Check,
-  Link2,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  Maximize2,
-  Move,
-} from 'lucide-react';
+  IconVideo,
+  IconVideoOff,
+  IconMicrophone,
+  IconMicrophoneOff,
+  IconScreenShare,
+  IconSettings,
+  IconPhone,
+  IconPlayerRecord,
+  IconUsers,
+  IconMessage,
+  IconDotsVertical,
+  IconX,
+  IconSend,
+  IconUserPlus,
+  IconCopy,
+  IconCheck,
+  IconLink,
+  IconChevronLeft,
+  IconChevronRight,
+  IconChevronDown,
+  IconMaximize,
+  IconGripVertical,
+  IconAlertTriangle,
+} from '@tabler/icons-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback } from './ui/avatar';
@@ -706,7 +706,7 @@ export default function StudioCall({
               className="text-white hover:bg-white/10"
               onClick={toggleFullscreen}
             >
-              <Maximize2 className="size-4" />
+              <IconMaximize className="size-4" />
             </Button>
 
             {/* Theme Toggle */}
@@ -720,7 +720,7 @@ export default function StudioCall({
                 className="text-white hover:bg-white/10"
                 onClick={() => setShowInviteModal(true)}
               >
-                <UserPlus className="size-4 mr-2" />
+                <IconUserPlus className="size-4 mr-2" />
                 Invite
               </Button>
             )}
@@ -731,32 +731,32 @@ export default function StudioCall({
               className="text-white hover:bg-white/10"
               onClick={() => setShowParticipants(!showParticipants)}
             >
-              <Users className="size-4 mr-2" />
+              <IconUsers className="size-4 mr-2" />
               {participants.length + 1}
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
-                  <MoreVertical className="size-4" />
+                  <IconDotsVertical className="size-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {inviteCode && (
                   <>
                     <DropdownMenuItem onClick={() => setShowInviteModal(true)}>
-                      <UserPlus className="size-4 mr-2" />
+                      <IconUserPlus className="size-4 mr-2" />
                       Invite Participants
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                   </>
                 )}
                 <DropdownMenuItem onClick={() => setShowSettings(true)}>
-                  <Settings className="size-4 mr-2" />
+                  <IconSettings className="size-4 mr-2" />
                   Settings
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setShowChat(!showChat)}>
-                  <MessageSquare className="size-4 mr-2" />
+                  <IconMessage className="size-4 mr-2" />
                   {showChat ? 'Hide Chat' : 'Show Chat'}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -764,7 +764,7 @@ export default function StudioCall({
                   className="text-destructive"
                   onClick={handleLeaveCall}
                 >
-                  <Phone className="size-4 mr-2 rotate-135" />
+                  <IconPhone className="size-4 mr-2 rotate-135" />
                   Leave Studio
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -950,14 +950,14 @@ export default function StudioCall({
                 </div>
                 <div className="flex items-center gap-2">
                   {audioEnabled ? (
-                    <Mic className="size-4 text-muted-foreground" />
+                    <IconMicrophone className="size-4 text-muted-foreground" />
                   ) : (
-                    <MicOff className="size-4 text-destructive" />
+                    <IconMicrophoneOff className="size-4 text-destructive" />
                   )}
                   {videoEnabled ? (
-                    <Video className="size-4 text-muted-foreground" />
+                    <IconVideo className="size-4 text-muted-foreground" />
                   ) : (
-                    <VideoOff className="size-4 text-destructive" />
+                    <IconVideoOff className="size-4 text-destructive" />
                   )}
                 </div>
               </div>
@@ -985,14 +985,14 @@ export default function StudioCall({
                   </div>
                   <div className="flex items-center gap-2">
                     {participant.audioEnabled ? (
-                      <Mic className="size-4 text-muted-foreground" />
+                      <IconMicrophone className="size-4 text-muted-foreground" />
                     ) : (
-                      <MicOff className="size-4 text-destructive" />
+                      <IconMicrophoneOff className="size-4 text-destructive" />
                     )}
                     {participant.videoEnabled ? (
-                      <Video className="size-4 text-muted-foreground" />
+                      <IconVideo className="size-4 text-muted-foreground" />
                     ) : (
-                      <VideoOff className="size-4 text-destructive" />
+                      <IconVideoOff className="size-4 text-destructive" />
                     )}
                   </div>
                 </div>
@@ -1007,7 +1007,7 @@ export default function StudioCall({
             <div className="flex items-center justify-between p-4 border-b">
               <h3>Chat</h3>
               <Button variant="ghost" size="icon" onClick={() => setShowChat(false)}>
-                <X className="size-4" />
+                <IconX className="size-4" />
               </Button>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -1038,7 +1038,7 @@ export default function StudioCall({
                   className="flex-1 px-3 py-2 text-sm bg-muted rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-primary"
                 />
                 <Button size="icon" onClick={handleSendMessage}>
-                  <Send className="size-4" />
+                  <IconSend className="size-4" />
                 </Button>
               </div>
             </div>
@@ -1052,14 +1052,14 @@ export default function StudioCall({
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold">Call Settings</h3>
                 <Button variant="ghost" size="icon" onClick={() => setShowSettings(false)}>
-                  <X className="size-4" />
+                  <IconX className="size-4" />
                 </Button>
               </div>
 
               {/* Connection Quality Indicator */}
               {connectionQuality === 'poor' && (
                 <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg flex items-center gap-2">
-                  <AlertTriangle className="size-5 text-yellow-500" />
+                  <IconAlertTriangle className="size-5 text-yellow-500" />
                   <div>
                     <p className="text-sm font-medium text-yellow-500">Poor Connection</p>
                     <p className="text-xs text-muted-foreground">Consider lowering video quality or bitrate</p>
@@ -1161,7 +1161,7 @@ export default function StudioCall({
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Invite Participants</h3>
                 <Button variant="ghost" size="icon" onClick={() => setShowInviteModal(false)}>
-                  <X className="size-4" />
+                  <IconX className="size-4" />
                 </Button>
               </div>
 
@@ -1173,7 +1173,7 @@ export default function StudioCall({
                 {/* Invite Link */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    <Link2 className="size-4 inline mr-1" />
+                    <IconLink className="size-4 inline mr-1" />
                     Invite Link
                   </label>
                   <div className="flex gap-2">
@@ -1191,12 +1191,12 @@ export default function StudioCall({
                     >
                       {inviteCopied ? (
                         <>
-                          <Check className="size-4 mr-1 text-green-500" />
+                          <IconCheck className="size-4 mr-1 text-green-500" />
                           Copied!
                         </>
                       ) : (
                         <>
-                          <Copy className="size-4 mr-1" />
+                          <IconCopy className="size-4 mr-1" />
                           Copy
                         </>
                       )}
@@ -1221,12 +1221,12 @@ export default function StudioCall({
                     >
                       {codeCopied ? (
                         <>
-                          <Check className="size-4 mr-1 text-green-500" />
+                          <IconCheck className="size-4 mr-1 text-green-500" />
                           Copied!
                         </>
                       ) : (
                         <>
-                          <Copy className="size-4 mr-1" />
+                          <IconCopy className="size-4 mr-1" />
                           Copy
                         </>
                       )}
@@ -1256,7 +1256,7 @@ export default function StudioCall({
               className="size-12 rounded-full text-white hover:bg-white/10"
               onClick={() => setShowSettings(true)}
             >
-              <Settings className="size-5" />
+              <IconSettings className="size-5" />
             </Button>
           </div>
 
@@ -1270,7 +1270,7 @@ export default function StudioCall({
                   className={`size-12 rounded-l-full rounded-r-none ${audioEnabled ? 'text-white hover:bg-white/10' : ''}`}
                   onClick={handleToggleAudio}
                 >
-                  {audioEnabled ? <Mic className="size-5" /> : <MicOff className="size-5" />}
+                  {audioEnabled ? <IconMicrophone className="size-5" /> : <IconMicrophoneOff className="size-5" />}
                 </Button>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -1278,7 +1278,7 @@ export default function StudioCall({
                     size="icon"
                     className={`size-12 rounded-r-full rounded-l-none border-l border-white/20 px-1 ${audioEnabled ? 'text-white hover:bg-white/10' : ''}`}
                   >
-                    <ChevronDown className="size-3" />
+                    <IconChevronDown className="size-3" />
                   </Button>
                 </DropdownMenuTrigger>
               </div>
@@ -1305,7 +1305,7 @@ export default function StudioCall({
                   className={`size-12 rounded-l-full rounded-r-none ${videoEnabled ? 'text-white hover:bg-white/10' : ''}`}
                   onClick={handleToggleVideo}
                 >
-                  {videoEnabled ? <Video className="size-5" /> : <VideoOff className="size-5" />}
+                  {videoEnabled ? <IconVideo className="size-5" /> : <IconVideoOff className="size-5" />}
                 </Button>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -1313,7 +1313,7 @@ export default function StudioCall({
                     size="icon"
                     className={`size-12 rounded-r-full rounded-l-none border-l border-white/20 px-1 ${videoEnabled ? 'text-white hover:bg-white/10' : ''}`}
                   >
-                    <ChevronDown className="size-3" />
+                    <IconChevronDown className="size-3" />
                   </Button>
                 </DropdownMenuTrigger>
               </div>
@@ -1337,28 +1337,26 @@ export default function StudioCall({
               className={`size-12 rounded-full ${!isScreenSharing ? 'text-white hover:bg-white/10' : ''}`}
               onClick={handleToggleScreenShare}
             >
-              <Monitor className="size-5" />
+              <IconScreenShare className="size-5" />
             </Button>
 
             {isRecording ? (
               <Button
                 variant="destructive"
-                size="sm"
-                className="px-4 rounded-full"
+                size="icon"
+                className="size-12 rounded-full"
                 onClick={handleStopRecording}
               >
-                <Radio className="size-4 mr-1.5 animate-pulse" />
-                Stop
+                <IconPlayerRecord className="size-5 animate-pulse" />
               </Button>
             ) : (
               <Button
                 variant="ghost"
-                size="sm"
-                className="px-4 rounded-full text-white hover:bg-white/10"
+                size="icon"
+                className="size-12 rounded-full text-white hover:bg-white/10"
                 onClick={handleStartRecording}
               >
-                <Radio className="size-4 mr-1.5" />
-                Record
+                <IconPlayerRecord className="size-5" />
               </Button>
             )}
 
@@ -1368,7 +1366,7 @@ export default function StudioCall({
               className="size-12 rounded-full ml-2"
               onClick={handleLeaveCall}
             >
-              <Phone className="size-5 rotate-135" />
+              <IconPhone className="size-5 rotate-135" />
             </Button>
           </div>
 
@@ -1379,7 +1377,7 @@ export default function StudioCall({
               className={`size-12 rounded-full ${!showChat ? 'text-white hover:bg-white/10' : ''}`}
               onClick={() => setShowChat(!showChat)}
             >
-              <MessageSquare className="size-5" />
+              <IconMessage className="size-5" />
             </Button>
           </div>
         </div>

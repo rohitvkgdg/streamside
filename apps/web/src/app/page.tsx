@@ -33,7 +33,7 @@ export default function ImprovedLandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="py-20 px-4 bg-gradient-to-b from-background to-muted/20">
+      <section className="py-20 px-4 bg-linear-to-b from-background to-muted/20">
         <div className="max-w-7xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-6 border border-primary/20">
             <Zap className="size-4" />
@@ -85,7 +85,7 @@ export default function ImprovedLandingPage() {
             <div className="md:col-span-2 md:row-span-2 cursor-pointer rounded-xl border border-border bg-card text-card-foreground shadow-sm hover:shadow-lg hover:border-primary/30 hover:scale-[1.02] transition-all duration-200 group">
               <div className="p-8 h-full flex flex-col justify-between">
                 <div>
-                  <div className="size-16 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center mb-6">
+                  <div className="size-16 rounded-2xl bg-linear-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center mb-6">
                     <Video className="size-8 text-primary" strokeWidth={1.5} />
                   </div>
                   <h3 className="text-2xl mb-3">HD Video Calls</h3>
@@ -104,7 +104,7 @@ export default function ImprovedLandingPage() {
             {/* Browser-Based */}
             <div className="md:col-span-2 md:row-span-1 cursor-pointer rounded-xl border border-border bg-card text-card-foreground shadow-sm hover:shadow-md hover:border-primary/30 hover:scale-[1.02] transition-all duration-200 group">
               <div className="p-6 h-full flex items-start gap-4">
-                <div className="size-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center flex-shrink-0">
+                <div className="size-12 rounded-xl bg-linear-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center shrink-0">
                   <Globe className="size-6 text-primary" strokeWidth={1.5} />
                 </div>
                 <div className="flex-1">
@@ -119,7 +119,7 @@ export default function ImprovedLandingPage() {
             {/* Lightweight UI */}
             <div className="md:col-span-2 md:row-span-1 cursor-pointer rounded-xl border border-border bg-card text-card-foreground shadow-sm hover:shadow-md hover:border-primary/30 hover:scale-[1.02] transition-all duration-200 group">
               <div className="p-6 h-full flex items-start gap-4">
-                <div className="size-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center flex-shrink-0">
+                <div className="size-12 rounded-xl bg-linear-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center shrink-0">
                   <Feather className="size-6 text-primary" strokeWidth={1.5} />
                 </div>
                 <div className="flex-1">
@@ -134,7 +134,7 @@ export default function ImprovedLandingPage() {
             {/* Secure P2P Connection */}
             <div className="md:col-span-2 md:row-span-1 cursor-pointer rounded-xl border border-border bg-card text-card-foreground shadow-sm hover:shadow-md hover:border-primary/30 hover:scale-[1.02] transition-all duration-200 group">
               <div className="p-6 h-full flex items-start gap-4">
-                <div className="size-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center flex-shrink-0">
+                <div className="size-12 rounded-xl bg-linear-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center shrink-0">
                   <Shield className="size-6 text-primary" strokeWidth={1.5} />
                 </div>
                 <div className="flex-1">
@@ -149,7 +149,7 @@ export default function ImprovedLandingPage() {
             {/* No Sign-Up Needed */}
             <div className="md:col-span-2 md:row-span-1 cursor-pointer rounded-xl border border-border bg-card text-card-foreground shadow-sm hover:shadow-md hover:border-primary/30 hover:scale-[1.02] transition-all duration-200 group">
               <div className="p-6 h-full flex items-start gap-4">
-                <div className="size-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center flex-shrink-0">
+                <div className="size-12 rounded-xl bg-linear-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center shrink-0">
                   <UserPlus className="size-6 text-primary" strokeWidth={1.5} />
                 </div>
                 <div className="flex-1">
@@ -164,7 +164,7 @@ export default function ImprovedLandingPage() {
             {/* Easy Screen Sharing */}
             <div className="md:col-span-2 md:row-span-1 cursor-pointer rounded-xl border border-border bg-card text-card-foreground shadow-sm hover:shadow-md hover:border-primary/30 hover:scale-[1.02] transition-all duration-200 group">
               <div className="p-6 h-full flex items-start gap-4">
-                <div className="size-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center flex-shrink-0">
+                <div className="size-12 rounded-xl bg-linear-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center shrink-0">
                   <Monitor className="size-6 text-primary" strokeWidth={1.5} />
                 </div>
                 <div className="flex-1">
@@ -179,7 +179,7 @@ export default function ImprovedLandingPage() {
             {/* Team Chat - Extended to fill space */}
             <div className="md:col-span-4 md:row-span-1 cursor-pointer rounded-xl border border-border bg-card text-card-foreground shadow-sm hover:shadow-md hover:border-primary/30 hover:scale-[1.02] transition-all duration-200 group">
               <div className="p-6 h-full flex items-start gap-4">
-                <div className="size-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center flex-shrink-0">
+                <div className="size-12 rounded-xl bg-linear-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/10 flex items-center justify-center shrink-0">
                   <MessageSquare className="size-6 text-primary" strokeWidth={1.5} />
                 </div>
                 <div className="flex-1">
@@ -198,7 +198,7 @@ export default function ImprovedLandingPage() {
 
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
+      <section className="py-20 px-4 bg-linear-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl mb-6">
             Ready to connect with your team?
