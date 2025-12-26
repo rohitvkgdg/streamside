@@ -1,12 +1,24 @@
+############################################################
+# STREAMSIDE LIVEKIT - PRODUCTION SAFE CONFIG
+############################################################
+# This config uses network_mode: host for:
+# 1. Best WebRTC performance (no Docker NAT overhead)
+# 2. No port mapping issues (avoids Docker spawning processes)
+# 3. Simple and stable deployment
+#
+# COOLIFY ENV VARS REQUIRED:
+# - LIVEKIT_API_KEY    (e.g., APIStreamside)
+# - LIVEKIT_API_SECRET (your secret)
+#
+# FIREWALL: Open ports 7880, 7881, 3478, 50000-50020/udp
+############################################################
+
 services:
   livekit:
     image: livekit/livekit-server:latest
     container_name: livekit-server
     restart: unless-stopped
-    ports:
-      - "7880:7880"
-      - "7881:7881"
-      - "50000-50100:50000-50100/udp"
+    network_mode: host
     environment:
       LIVEKIT_CONFIG: |
         port: 7880
@@ -14,7 +26,7 @@ services:
           - "0.0.0.0"
         rtc:
           port_range_start: 50000
-          port_range_end: 50100
+          port_range_end: 50020
           use_external_ip: true
           tcp_port: 7881
         turn:
@@ -25,13 +37,14 @@ services:
         room:
           auto_create: true
           empty_timeout: 300
-          max_participants: 50
+          max_participants: 20
         logging:
           level: info
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.livekit.rule=Host(`live.rohit.one`)"
-      - "traefik.http.routers.livekit.entrypoints=websecure"
-      - "traefik.http.routers.livekit.tls=true"
-      - "traefik.http.routers.livekit.tls.certresolver=letsencrypt"
-      - "traefik.http.services.livekit.loadbalancer.server.port=7880"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
