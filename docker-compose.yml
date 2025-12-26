@@ -23,14 +23,11 @@ services:
     container_name: streamside-livekit
     ports:
       - '7880:7880' # WebSocket
-      - '7881:7881' # HTTP
-      - '7882:7882/udp' # RTC
-    environment:
-      LIVEKIT_KEYS: ${LIVEKIT_KEYS}
-      LIVEKIT_REDIS_HOST: redis:6379
+      - '7881:7881' # TCP
+      - '50000-50100:50000-50100/udp' # RTC media
     volumes:
-      - ./livekit.yaml:/etc/livekit.yaml
-    command: --config /etc/livekit.yaml --node-ip=127.0.0.1
+      - ./livekit.yaml:/etc/livekit.yaml:ro
+    command: --config /etc/livekit.yaml
     depends_on:
       - redis
     networks:

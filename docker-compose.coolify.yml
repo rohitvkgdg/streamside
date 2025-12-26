@@ -3,11 +3,11 @@ version: '3.9'
 # =============================================================================
 # STREAMSIDE LIVEKIT - FOR COOLIFY
 # =============================================================================
-# SETUP STEPS:
-# 1. SSH to your server and create config: mkdir -p /opt/livekit
-# 2. Copy livekit.prod.yaml content to /opt/livekit/config.yaml
-# 3. Set LIVEKIT_KEYS in Coolify (format: APIStreamside:your-secret)
-# 4. Open ports: 7880,7881/tcp and 3478,50000-60000/udp
+# SETUP:
+# 1. SSH to server: mkdir -p /opt/livekit
+# 2. Create /opt/livekit/config.yaml with content below
+# 3. Open ports: 7880,7881/tcp and 3478,50000-60000/udp
+# 4. Deploy this compose in Coolify
 # =============================================================================
 
 services:
@@ -18,12 +18,28 @@ services:
     network_mode: host
     volumes:
       - /opt/livekit/config.yaml:/config.yaml:ro
-    environment:
-      - LIVEKIT_KEYS=${LIVEKIT_KEYS}
     command: ["--config", "/config.yaml"]
-    healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:7880/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+
+# =============================================================================
+# /opt/livekit/config.yaml content (create on server):
+# -----------------------------------------------------------------------------
+# port: 7880
+# bind_addresses:
+#   - "0.0.0.0"
+# rtc:
+#   port_range_start: 50000
+#   port_range_end: 60000
+#   use_external_ip: true
+#   tcp_port: 7881
+# turn:
+#   enabled: true
+#   udp_port: 3478
+# keys:
+#   APIStreamside: YOUR_SECRET_HERE
+# room:
+#   auto_create: true
+#   empty_timeout: 300
+#   max_participants: 50
+# logging:
+#   level: info
+# =============================================================================
