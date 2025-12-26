@@ -708,7 +708,7 @@ export default function StudioCall({
       </header>
 
       {/* Main Content - Fullscreen video layout */}
-      <main className="absolute inset-0 overflow-hidden bg-black">
+      <main className="absolute inset-0 z-10 overflow-hidden bg-black">
         {(() => {
           // Check if anyone is screen sharing
           const remoteScreenSharer = allParticipants.find(p => !p.isLocal && p.getTrackPublication(Track.Source.ScreenShare)?.track);
@@ -1179,7 +1179,7 @@ export default function StudioCall({
 
       {/* Controls Footer - Translucent, auto-hide */}
       <footer
-        className={`absolute bottom-0 left-0 right-0 z-40 bg-black/60 backdrop-blur-md border-t border-white/10 px-4 py-3 transition-all duration-300 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full'
+        className={`absolute bottom-0 left-0 right-0 z-50 bg-black/60 backdrop-blur-md border-t border-white/10 px-4 py-3 transition-all duration-300 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full'
           }`}
       >
         <div className="flex items-center justify-between max-w-4xl mx-auto">
