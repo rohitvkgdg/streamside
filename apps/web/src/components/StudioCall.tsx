@@ -672,11 +672,8 @@ export default function StudioCall({
 
   return (
     <div className="h-screen w-screen bg-black relative overflow-hidden">
-      {/* Fullscreen Header - Translucent, auto-hide */}
-      <header
-        className={`absolute top-0 left-0 right-0 z-40 bg-black/60 backdrop-blur-md border-b border-white/10 px-4 py-2 transition-all duration-300 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
-          }`}
-      >
+      {/* Header - Always visible, transparent with subtle text shadow */}
+      <header className="absolute top-0 left-0 right-0 z-40 px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div>
@@ -1003,7 +1000,7 @@ export default function StudioCall({
 
         {/* Chat Panel */}
         {showChat && (
-          <div className="absolute top-0 right-0 bottom-0 w-80 bg-card border-l border-border flex flex-col">
+          <div className="absolute top-0 right-0 bottom-0 w-80 z-[60] bg-card border-l border-border flex flex-col">
             <div className="flex items-center justify-between p-4 border-b">
               <h3>Chat</h3>
               <Button variant="ghost" size="icon" onClick={() => setShowChat(false)}>
@@ -1243,12 +1240,9 @@ export default function StudioCall({
         )}
       </main>
 
-      {/* Controls Footer - Translucent, auto-hide */}
-      <footer
-        className={`absolute bottom-0 left-0 right-0 z-50 bg-black/60 backdrop-blur-md border-t border-white/10 px-4 py-3 transition-all duration-300 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full'
-          }`}
-      >
-        <div className="flex items-center justify-between max-w-4xl mx-auto">
+      {/* Controls Footer - Notch style, always visible, centered pill */}
+      <footer className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50">
+        <div className="flex items-center gap-2 bg-black/70 backdrop-blur-xl rounded-full px-4 py-2 border border-white/10">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
