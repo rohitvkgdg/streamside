@@ -10,6 +10,7 @@ import {
   useRoomContext,
   RoomAudioRenderer,
 } from '@livekit/components-react'
+import { VideoPresets, RoomOptions } from 'livekit-client'
 import '@livekit/components-styles'
 
 // Guest session helpers
@@ -258,7 +259,23 @@ function StudioCallPageContent() {
       serverUrl={wsUrl}
       token={token}
       connectOptions={{ autoSubscribe: true }}
-      video={true}
+      options={{
+        videoCaptureDefaults: {
+          resolution: VideoPresets.h1080.resolution,
+          facingMode: 'user',
+        },
+        publishDefaults: {
+          videoSimulcastLayers: [VideoPresets.h540, VideoPresets.h720, VideoPresets.h1080],
+          videoCodec: 'vp9',
+          dtx: true,
+          red: true,
+        },
+        dynacast: true,
+        adaptiveStream: true,
+      } satisfies RoomOptions}
+      video={{
+        resolution: VideoPresets.h1080.resolution,
+      }}
       audio={true}
       style={{ height: '100vh', width: '100vw' }}
       onDisconnected={handleLeaveStudio}
