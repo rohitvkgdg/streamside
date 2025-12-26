@@ -1177,69 +1177,69 @@ export default function StudioCall({
         )}
       </main>
 
-      {/* Controls Footer */}
-      <footer className="bg-white dark:bg-neutral-950 border-t border-neutral-200 dark:border-neutral-800 px-4 py-4">
+      {/* Controls Footer - Translucent, auto-hide */}
+      <footer
+        className={`absolute bottom-0 left-0 right-0 z-40 bg-black/60 backdrop-blur-md border-t border-white/10 px-4 py-3 transition-all duration-300 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full'
+          }`}
+      >
         <div className="flex items-center justify-between max-w-4xl mx-auto">
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" className="size-14 rounded-full" onClick={() => setShowSettings(true)}>
-              <Settings className="size-6" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-12 rounded-full text-white hover:bg-white/10"
+              onClick={() => setShowSettings(true)}
+            >
+              <Settings className="size-5" />
             </Button>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Button
-              variant={audioEnabled ? 'outline' : 'destructive'}
+              variant={audioEnabled ? 'ghost' : 'destructive'}
               size="icon"
-              className="size-14 rounded-full"
+              className={`size-12 rounded-full ${audioEnabled ? 'text-white hover:bg-white/10' : ''}`}
               onClick={handleToggleAudio}
             >
-              {audioEnabled ? (
-                <Mic className="size-6" />
-              ) : (
-                <MicOff className="size-6" />
-              )}
+              {audioEnabled ? <Mic className="size-5" /> : <MicOff className="size-5" />}
             </Button>
 
             <Button
-              variant={videoEnabled ? 'outline' : 'destructive'}
+              variant={videoEnabled ? 'ghost' : 'destructive'}
               size="icon"
-              className="size-14 rounded-full"
+              className={`size-12 rounded-full ${videoEnabled ? 'text-white hover:bg-white/10' : ''}`}
               onClick={handleToggleVideo}
             >
-              {videoEnabled ? (
-                <Video className="size-6" />
-              ) : (
-                <VideoOff className="size-6" />
-              )}
+              {videoEnabled ? <Video className="size-5" /> : <VideoOff className="size-5" />}
             </Button>
 
             <Button
-              variant={isScreenSharing ? 'default' : 'outline'}
+              variant={isScreenSharing ? 'secondary' : 'ghost'}
               size="icon"
-              className="size-14 rounded-full"
+              className={`size-12 rounded-full ${!isScreenSharing ? 'text-white hover:bg-white/10' : ''}`}
               onClick={handleToggleScreenShare}
             >
-              <Monitor className="size-6" />
+              <Monitor className="size-5" />
             </Button>
 
             {isRecording ? (
               <Button
                 variant="destructive"
-                size="lg"
-                className="px-6"
+                size="sm"
+                className="px-4 rounded-full"
                 onClick={handleStopRecording}
               >
-                <Radio className="size-5 mr-2" />
-                Stop Recording
+                <Radio className="size-4 mr-1.5 animate-pulse" />
+                Stop
               </Button>
             ) : (
               <Button
-                variant="outline"
-                size="lg"
-                className="px-6"
+                variant="ghost"
+                size="sm"
+                className="px-4 rounded-full text-white hover:bg-white/10"
                 onClick={handleStartRecording}
               >
-                <Radio className="size-5 mr-2" />
+                <Radio className="size-4 mr-1.5" />
                 Record
               </Button>
             )}
@@ -1247,21 +1247,21 @@ export default function StudioCall({
             <Button
               variant="destructive"
               size="icon"
-              className="size-14 rounded-full transition-colors"
+              className="size-12 rounded-full ml-2"
               onClick={handleLeaveCall}
             >
-              <Phone className="size-6 rotate-135" />
+              <Phone className="size-5 rotate-135" />
             </Button>
           </div>
 
           <div className="flex items-center gap-2">
             <Button
-              variant={showChat ? 'default' : 'outline'}
+              variant={showChat ? 'secondary' : 'ghost'}
               size="icon"
-              className="size-14 rounded-full"
+              className={`size-12 rounded-full ${!showChat ? 'text-white hover:bg-white/10' : ''}`}
               onClick={() => setShowChat(!showChat)}
             >
-              <MessageSquare className="size-6" />
+              <MessageSquare className="size-5" />
             </Button>
           </div>
         </div>
