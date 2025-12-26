@@ -823,7 +823,7 @@ export default function StudioCall({
                       </div>
                     )}
 
-                    <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 bg-gradient-to-t from-black/70 to-transparent">
+                    <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 bg-linear-to-t from-black/70 to-transparent">
                       <div className="flex items-center gap-2">
                         <p className="text-white text-sm md:text-base font-medium">You</p>
                         <Badge variant="secondary" className="text-xs bg-white/20 text-white border-0">Local</Badge>
@@ -858,7 +858,7 @@ export default function StudioCall({
                             </div>
                           )}
 
-                          <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 bg-gradient-to-t from-black/70 to-transparent">
+                          <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 bg-linear-to-t from-black/70 to-transparent">
                             <div className="flex items-center gap-2">
                               <p className="text-white text-sm md:text-base font-medium">{participant.name || participant.identity}</p>
                             </div>
@@ -1131,7 +1131,7 @@ export default function StudioCall({
                       variant="outline"
                       size="sm"
                       onClick={handleCopyInviteLink}
-                      className="flex-shrink-0"
+                      className="shrink-0"
                     >
                       {inviteCopied ? (
                         <>
@@ -1161,7 +1161,7 @@ export default function StudioCall({
                       variant="outline"
                       size="sm"
                       onClick={handleCopyCode}
-                      className="flex-shrink-0"
+                      className="shrink-0"
                     >
                       {codeCopied ? (
                         <>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState, useCallback, Suspense } from 'react'
+import { useEffect, useState, useCallback, Suspense, useRef } from 'react'
 import { useSession } from '@/lib/auth-client'
 import StudioCall, { Participant } from '@/components/StudioCall'
 import {
@@ -126,14 +126,24 @@ function StudioCallPageContent() {
     fetchStudioInfo()
   }, [studioId])
 
-  // Redirect if no session or guest info
+  // Redirect if no session or guest info - only on initial load
+  const hasCheckedAuth = useRef(false)
   useEffect(() => {
+    // Only check auth once on initial mount
+    if (hasCheckedAuth.current) return
+
     if (!isPending && !session && !guestInfo) {
+      hasCheckedAuth.current = true
       const timer = setTimeout(() => {
         const info = getGuestInfo()
         if (!info) router.push('/auth/signin')
       }, 200)
       return () => clearTimeout(timer)
+    }
+
+    // Mark as checked if we have valid auth
+    if (!isPending && (session || guestInfo)) {
+      hasCheckedAuth.current = true
     }
   }, [isPending, session, guestInfo, router])
 
