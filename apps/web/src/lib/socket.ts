@@ -75,6 +75,16 @@ export function initializeSocketServer(httpServer: NetServer): SocketIOServer {
             socket.to(studioId).emit('chunk-uploaded', { participantId, chunkIndex })
         })
 
+        // Chat message - broadcast to all in room
+        socket.on('chat-message', ({ studioId, message }: {
+            studioId: string
+            message: { id: number; name: string; text: string; time: string; senderId: string }
+        }) => {
+            console.log(`💬 Chat message in studio ${studioId} from ${message.name}`)
+            // Broadcast to everyone in the room (including sender for confirmation)
+            io?.to(studioId).emit('chat-message', message)
+        })
+
         // Handle disconnection
         socket.on('disconnect', () => {
             console.log(`❌ Socket disconnected: ${socket.id}`)

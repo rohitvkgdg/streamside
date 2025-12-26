@@ -46,10 +46,12 @@ function getGuestInfo(): { guestName: string; guestId: string } | null {
 function LiveKitParticipantSync({
   studioName,
   inviteCode,
+  studioId,
   onLeave,
 }: {
   studioName: string
   inviteCode?: string
+  studioId?: string | null
   onLeave: () => void
 }) {
   const participants = useParticipants()
@@ -78,6 +80,7 @@ function LiveKitParticipantSync({
       onLeave={handleLeave}
       studioName={studioName}
       inviteCode={inviteCode}
+      studioId={studioId ?? undefined}
     />
   )
 }
@@ -288,6 +291,7 @@ function StudioCallPageContent() {
       <LiveKitParticipantSync
         studioName={studioName}
         inviteCode={inviteCode}
+        studioId={studioId ?? undefined}
         onLeave={handleLeaveStudio}
       />
     </LiveKitRoom>

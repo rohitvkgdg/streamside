@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { io, Socket } from 'socket.io-client';
 import {
   Video,
   AlertTriangle,
@@ -20,6 +21,10 @@ import {
   Copy,
   Check,
   Link2,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
+  Move,
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -55,6 +60,7 @@ interface StudioCallProps {
   onLeave: () => void;
   studioName?: string;
   inviteCode?: string;
+  studioId?: string; // Added for socket room
 }
 
 export default function StudioCall({
@@ -62,12 +68,13 @@ export default function StudioCall({
   onLeave,
   studioName = 'Studio Session',
   inviteCode,
+  studioId,
 }: StudioCallProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [showParticipants, setShowParticipants] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [chatMessages, setChatMessages] = useState<{ id: number; name: string; text: string; time: string }[]>([]);
+  const [chatMessages, setChatMessages] = useState<{ id: number; name: string; text: string; time: string; senderId?: string }[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [mirrorVideo, setMirrorVideo] = useState(true);
   const [videoQuality, setVideoQuality] = useState<'720p' | '1080p' | '1080p60'>('1080p60');
@@ -76,6 +83,17 @@ export default function StudioCall({
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteCopied, setInviteCopied] = useState(false);
   const [codeCopied, setCodeCopied] = useState(false);
+
+  // New UI state
+  const [currentPage, setCurrentPage] = useState(0);
+  const [showControls, setShowControls] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [pipPosition, setPipPosition] = useState({ x: 20, y: 20 });
+  const [isDraggingPip, setIsDraggingPip] = useState(false);
+  const [bitrateApplied, setBitrateApplied] = useState(false);
+
+  // Socket connection
+  const socketRef = useRef<Socket | null>(null);
 
   // LiveKit hooks for local participant
   const { localParticipant } = useLocalParticipant();
@@ -158,6 +176,68 @@ export default function StudioCall({
     };
   }, [room, localParticipant]);
 
+  // Socket.io connection for real-time chat
+  useEffect(() => {
+    if (!studioId) return;
+
+    // Initialize socket connection
+    const socket = io({
+      path: '/api/socket/io',
+      transports: ['websocket', 'polling'],
+    });
+
+    socket.on('connect', () => {
+      console.log('Connected to chat socket:', socket.id);
+      socket.emit('join-studio', studioId);
+    });
+
+    // Listen for incoming chat messages
+    socket.on('chat-message', (message: { id: number; name: string; text: string; time: string; senderId: string }) => {
+      // Don't add duplicate messages from yourself
+      setChatMessages(prev => {
+        const exists = prev.some(m => m.id === message.id);
+        if (exists) return prev;
+        return [...prev, message];
+      });
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from chat socket');
+    });
+
+    socketRef.current = socket;
+
+    return () => {
+      socket.emit('leave-studio', studioId);
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [studioId]);
+
+  // Fullscreen toggle handler
+  const toggleFullscreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true));
+    } else {
+      document.exitFullscreen().then(() => setIsFullscreen(false));
+    }
+  }, []);
+
+  // Auto-hide controls after inactivity
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    const handleMouseMove = () => {
+      setShowControls(true);
+      clearTimeout(timeout);
+      timeout = setTimeout(() => setShowControls(false), 3000);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      clearTimeout(timeout);
+    };
+  }, []);
+
   // Generate invite link from code
   const inviteLink = inviteCode ? `${typeof window !== 'undefined' ? window.location.origin : ''}/invite/${inviteCode}` : '';
 
@@ -238,44 +318,59 @@ export default function StudioCall({
       const ctx = canvas.getContext('2d')!;
       canvasRef.current = canvas;
 
-      // Create video elements from MediaStream tracks
-      const createVideoElement = (stream: MediaStream, id: string): HTMLVideoElement => {
-        let videoEl = videoElementsRef.current.get(id);
-        if (!videoEl) {
-          videoEl = document.createElement('video');
-          videoEl.muted = true;
-          videoEl.playsInline = true;
-          videoEl.autoplay = true;
-          videoElementsRef.current.set(id, videoEl);
-        }
-        videoEl.srcObject = stream;
-        videoEl.play().catch(console.error);
-        return videoEl;
+      // Create video elements from MediaStreamTrack (not MediaStream)
+      const createVideoElement = (track: MediaStreamTrack, id: string): Promise<HTMLVideoElement> => {
+        return new Promise((resolve) => {
+          let videoEl = videoElementsRef.current.get(id);
+          if (!videoEl) {
+            videoEl = document.createElement('video');
+            videoEl.muted = true;
+            videoEl.playsInline = true;
+            videoEl.autoplay = true;
+            videoElementsRef.current.set(id, videoEl);
+          }
+          // Create MediaStream from the single track
+          const stream = new MediaStream([track]);
+          videoEl.srcObject = stream;
+
+          // Wait for video to be ready
+          if (videoEl.readyState >= 2) {
+            videoEl.play().catch(console.error);
+            resolve(videoEl);
+          } else {
+            videoEl.onloadeddata = () => {
+              videoEl!.play().catch(console.error);
+              resolve(videoEl!);
+            };
+            // Fallback timeout
+            setTimeout(() => resolve(videoEl!), 500);
+          }
+        });
       };
 
-      // Get local video stream
+      // Get local video stream - use mediaStreamTrack
       const localCameraTrack = localParticipant?.getTrackPublication(Track.Source.Camera)?.track;
       const localScreenTrack = localParticipant?.getTrackPublication(Track.Source.ScreenShare)?.track;
 
-      if (localCameraTrack?.mediaStream) {
-        createVideoElement(localCameraTrack.mediaStream, 'local-camera');
+      if (localCameraTrack?.mediaStreamTrack) {
+        await createVideoElement(localCameraTrack.mediaStreamTrack, 'local-camera');
       }
-      if (localScreenTrack?.mediaStream) {
-        createVideoElement(localScreenTrack.mediaStream, 'local-screen');
+      if (localScreenTrack?.mediaStreamTrack) {
+        await createVideoElement(localScreenTrack.mediaStreamTrack, 'local-screen');
       }
 
       // Get remote video streams
-      allParticipants.filter(p => !p.isLocal).forEach(participant => {
+      for (const participant of allParticipants.filter(p => !p.isLocal)) {
         const cameraTrack = participant.getTrackPublication(Track.Source.Camera)?.track;
         const screenTrack = participant.getTrackPublication(Track.Source.ScreenShare)?.track;
 
-        if (cameraTrack?.mediaStream) {
-          createVideoElement(cameraTrack.mediaStream, `${participant.identity}-camera`);
+        if (cameraTrack?.mediaStreamTrack) {
+          await createVideoElement(cameraTrack.mediaStreamTrack, `${participant.identity}-camera`);
         }
-        if (screenTrack?.mediaStream) {
-          createVideoElement(screenTrack.mediaStream, `${participant.identity}-screen`);
+        if (screenTrack?.mediaStreamTrack) {
+          await createVideoElement(screenTrack.mediaStreamTrack, `${participant.identity}-screen`);
         }
-      });
+      }
 
       // Draw frame function
       const drawFrame = () => {
@@ -371,25 +466,27 @@ export default function StudioCall({
       audioContextRef.current = new AudioContext();
       const destination = audioContextRef.current.createMediaStreamDestination();
 
-      // Add local audio
+      // Add local audio - use mediaStreamTrack
       const localAudioTrack = localParticipant?.getTrackPublication(Track.Source.Microphone)?.track;
-      if (localAudioTrack?.mediaStream) {
+      if (localAudioTrack?.mediaStreamTrack && audioContextRef.current) {
         try {
-          const source = audioContextRef.current.createMediaStreamSource(localAudioTrack.mediaStream);
+          const audioStream = new MediaStream([localAudioTrack.mediaStreamTrack]);
+          const source = audioContextRef.current.createMediaStreamSource(audioStream);
           source.connect(destination);
         } catch (e) { console.log('Local audio connection error:', e); }
       }
 
       // Add remote audio
-      allParticipants.filter(p => !p.isLocal).forEach(participant => {
+      for (const participant of allParticipants.filter(p => !p.isLocal)) {
         const audioTrack = participant.getTrackPublication(Track.Source.Microphone)?.track;
-        if (audioTrack?.mediaStream && audioContextRef.current) {
+        if (audioTrack?.mediaStreamTrack && audioContextRef.current) {
           try {
-            const source = audioContextRef.current.createMediaStreamSource(audioTrack.mediaStream);
+            const audioStream = new MediaStream([audioTrack.mediaStreamTrack]);
+            const source = audioContextRef.current.createMediaStreamSource(audioStream);
             source.connect(destination);
           } catch (e) { console.log('Remote audio connection error:', e); }
         }
-      });
+      }
 
       // Capture canvas stream + mixed audio
       const canvasStream = canvas.captureStream(30);
@@ -475,12 +572,24 @@ export default function StudioCall({
 
   const handleSendMessage = () => {
     if (!chatInput.trim()) return;
+
+    const participantName = localParticipant?.name || localParticipant?.identity || 'You';
+    const participantId = localParticipant?.identity || 'local';
+
     const newMessage = {
       id: Date.now(),
-      name: 'You',
+      name: participantName,
       text: chatInput.trim(),
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      senderId: participantId,
     };
+
+    // Emit to socket for other participants
+    if (socketRef.current && studioId) {
+      socketRef.current.emit('chat-message', { studioId, message: newMessage });
+    }
+
+    // Also add locally immediately for instant feedback
     setChatMessages(prev => [...prev, newMessage]);
     setChatInput('');
   };
