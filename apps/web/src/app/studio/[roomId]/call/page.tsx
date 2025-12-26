@@ -134,12 +134,15 @@ function StudioCallPageContent() {
     }
   }, [isPending, session, guestInfo, router])
 
-  // Fetch LiveKit token
+  // Fetch LiveKit token with retry logic
   useEffect(() => {
     if (!studioId) return
     if (!session && !guestInfo) return
 
-    async function fetchToken() {
+    let retryCount = 0
+    const maxRetries = 3
+
+    async function fetchTokenWithRetry(): Promise<void> {
       try {
         setIsLoadingToken(true)
         setError(null)
@@ -160,13 +163,23 @@ function StudioCallPageContent() {
         setToken(data.token)
         setWsUrl(data.wsUrl)
       } catch (err) {
-        console.error('Error fetching token:', err)
-        setError(err instanceof Error ? err.message : 'Failed to connect')
+        console.error(`Token fetch attempt ${retryCount + 1} failed:`, err)
+
+        if (retryCount < maxRetries) {
+          retryCount++
+          const delay = Math.min(1000 * Math.pow(2, retryCount), 5000) // Exponential backoff, max 5s
+          console.log(`Retrying in ${delay}ms...`)
+          await new Promise(resolve => setTimeout(resolve, delay))
+          return fetchTokenWithRetry()
+        }
+
+        setError(err instanceof Error ? err.message : 'Failed to connect after multiple attempts')
       } finally {
         setIsLoadingToken(false)
       }
     }
-    fetchToken()
+
+    fetchTokenWithRetry()
   }, [studioId, session, guestInfo])
 
   const handleLeaveStudio = useCallback(() => {
